@@ -29,8 +29,8 @@ module exponent_finder(
 	 
 	 reg [7:0] next_exponent;
 	 reg next_ready;
-	 reg [7:0] temp_product;
-	 reg [7:0] next_temp_product;
+	 reg [10:0] temp_product;
+	 reg [10:0] next_temp_product;
 	 
 	 
 	 initial begin
@@ -46,21 +46,29 @@ module exponent_finder(
 	 end
 	 
 	 always @(*) begin
-		if (input_enable) begin
-			if (temp_product < boundary) begin
-				next_temp_product = temp_product * base;
-				next_ready = 0;
-				next_exponent = exponent + 1;
+
+			if (input_enable) begin
+				if (temp_product < boundary) begin
+					next_temp_product = temp_product * base;
+					next_ready = 0;
+					next_exponent = exponent + 1;
+				end else begin
+					next_temp_product = temp_product;
+					next_ready = 1;
+					next_exponent = exponent;
+				end
 			end else begin
-				next_temp_product = temp_product;
-				next_ready = 1;
-				next_exponent = exponent;
+				if (ready) begin
+					next_ready = 1;
+					next_exponent = exponent;
+					next_temp_product = 1;
+				end else begin
+					next_temp_product = 1;
+					next_ready = 0;
+					next_exponent = 0;
+				end
+
 			end
-		end else begin
-			next_temp_product = 1;
-			next_ready = 0;
-			next_exponent = 0;
-		end
 	 end
 
 
