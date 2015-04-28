@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 module exponent_finder(
 	 input clk,
-    input [7:0] boundary,
+    input [63:0] boundary,
     input input_enable,
     input [8:0] base,
     output reg [7:0] exponent,

@@ -18,16 +18,16 @@
 // Additional Comments: 
 //
 //////////////////////////////////////////////////////////////////////////////////
-module GCD(input [31:0] a, input [31:0] b, input reset, input clk, output reg [31:0] gcd, output reg isDone
+module GCD(input [63:0] a, input [63:0] b, input reset, input clk, output reg [31:0] gcd, output reg isDone
     );
 	 
-	reg [31:0] nextInputA;
-	reg [31:0] nextInputB;
-	reg [31:0] inputA;
+	reg [63:0] nextInputA;
+	reg [63:0] nextInputB;
+	reg [63:0] inputA;
 	reg [31:0] inputB;
-	reg [31:0] nextExponent;
-	reg [31:0] exponent;
-	reg [31:0] nextGcd;
+	reg [63:0] nextExponent;
+	reg [63:0] exponent;
+	reg [63:0] nextGcd;
 	reg nextIsDone;
 
 	initial begin

@@ -20,8 +20,8 @@
 //////////////////////////////////////////////////////////////////////////////////
 module e_finder(
     input clk,
-    input [7:0] boundary,
-    output reg [64:0] e,
+    input [63:0] boundary,
+    output reg [63:0] e,
 	 output reg done
     );
 
@@ -30,7 +30,7 @@ module e_finder(
 	reg next_done;
 	reg [12:0] index;
 	reg [12:0] next_index;
-	reg [64:0] next_e;
+	reg [63:0] next_e;
 	reg has_index_changed;
 	reg next_has_index_changed;
 	reg reset_exponentiation;
@@ -82,7 +82,7 @@ module e_finder(
 	BinaryExponentiation binary_exponentiation (
     .clk(clk), 
     .base(data), 
-    .exponent(exponent-1), 
+    .exponent(exponent-8'd1), 
     .reset(reset_exponentiation), 
     .result(exponentiation_result), 
     .isDone(exponentiation_ready)
@@ -132,7 +132,7 @@ module e_finder(
 								end
 								next_input_enable = 0;
 								
-								if (data >= 13) begin 
+								if (data >= 5) begin 
 									next_done = 1;
 								end else begin
 									next_done = 0;
