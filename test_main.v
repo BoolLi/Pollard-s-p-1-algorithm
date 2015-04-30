@@ -26,7 +26,7 @@ module test_main;
 
 	// Inputs
 	reg clk;
-	reg [63:0] n;
+	reg [31:0] n;
 
 	// Outputs
 	wire [31:0] prime1;

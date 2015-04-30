@@ -18,7 +18,7 @@
 // Additional Comments: 
 //
 //////////////////////////////////////////////////////////////////////////////////
-module main(input clk, input [63:0] n, output [31:0] prime1 
+module main(input clk, input [31:0] n, output [31:0] prime1 
     );
 	 
 	 wire isExponentFinderDone;
@@ -30,7 +30,7 @@ module main(input clk, input [63:0] n, output [31:0] prime1
 	 reg next_enableLogCalculator;
 	 wire [63:0] e;
 	 wire [7:0] logCalcualtorResult;
-	 wire[63:0] gcdCalcualtorResult;
+	 wire[31:0] modResult;
 	 
 	 reg resetModCalculator;
 	 reg next_resetModCalculator;
@@ -45,14 +45,13 @@ module main(input clk, input [63:0] n, output [31:0] prime1
 	 reg startMod;
 	 reg nextStartMod;
 	 
-	 
-	 e_finder exponentFinder (.clk(clk), .boundary(64'd40), .e(e), .done(isExponentFinderDone));
+	 e_finder exponentFinder (.clk(clk), .boundary(n), .e(e), .done(isExponentFinderDone));
 	 
 	 exponent_finder logCalculator (.clk(clk), .boundary(n), .input_enable(enableLogCalculator), .base(9'd2), .exponent(logCalcualtorResult), .ready(isLogCalculatorDone));
 	 
-	 GCD gcdCalculator (.a(n), .b(gcdCalcualtorResult), .reset(resetGcd), .clk(clk), .gcd(prime1), .isDone(isGcdCalculatorDone));
+	 GCD gcdCalculator (.a(n), .b(modResult - 1), .reset(resetGcd), .clk(clk), .gcd(prime1), .isDone(isGcdCalculatorDone));
 	 
-	 modBigNumbers modCalculator (.reset(resetModCalculator), .start(startMod), .clk(clk), .exponent(64'd192), .number(n),  .logNum(logCalcualtorResult),  .outputResult(gcdCalcualtorResult), .isDone(isModCalculatorDone));
+	 modBigNumbers modCalculator (.reset(resetModCalculator), .clk(clk), .exponent(64'd192), .number(n),  .result(modResult), .isDone(isModCalculatorDone));
 	 
 	 initial begin
 		enableLogCalculator = 0;

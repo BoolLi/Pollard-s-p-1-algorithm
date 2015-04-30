@@ -18,67 +18,76 @@
 // Additional Comments: 
 //
 //////////////////////////////////////////////////////////////////////////////////
-module modBigNumbers(
-	 input reset,
-	 input start,
-	 input clk,
-    input [63:0] exponent,
-    input [63:0] number,
-    input [7:0] logNum,
-    output reg [63:0] outputResult,
-	 output reg isDone
+module modBigNumbers(input reset, input clk, input [63:0] exponent, input [31:0] number,
+    output reg [31:0] result, output reg isDone
     );
 	 
-	 reg [1000:0] nextResult;
-	 reg [1000:0] result;
-	 reg [63:0] nextOutputResult;
+	 reg [31:0] nextResult;
+	 reg [31:0] dividend;
 	 reg nextIsDone;
+	 reg [12:0] bitIndex;
+	 reg [12:0] nextBitIndex;
+	 reg [31:0] nextDividend;
+	 
+	 wire [31:0] remainder;
+	 wire [31:0] quotient; 
+	 wire [31:0] memMod;
+	 wire rfd;
 
 	initial begin
-		nextResult = 0;
 		nextIsDone = 0;
-		outputResult = 0;
-		nextOutputResult = 0;
-		result = 0; 
 		isDone = 0;
+		bitIndex = 0;
+		nextBitIndex = 0;
+		dividend = 1;
+		nextDividend = 1;
+		result = 0;
+		nextResult = 0; 
 	end
+	
+	 div_gen_v3_0 dviderModule (.clk(clk),.rfd(rfd),.dividend(dividend),.divisor(number), .quotient(quotient), .fractional(remainder)); 
 	
 	always @(posedge clk) begin
 		result <= nextResult;
 		isDone <= nextIsDone;
-		outputResult <= nextOutputResult;
+		bitIndex <= nextBitIndex;
+		dividend <= nextDividend;
 	end
 	
 	always @(*) begin
-		nextResult = result;
-		nextIsDone = isDone;
-		nextOutputResult = outputResult;
-		if (start) begin
-			if (isDone == 1) begin
-				nextOutputResult = result[63:0];
+		if (rfd == 1) begin
+			nextBitIndex = bitIndex < 64 ? bitIndex + 1 : bitIndex;
+			if (bitIndex == 64) begin
 				if (reset == 1) begin
 					nextIsDone = 0;
+					nextBitIndex = 0;
+					nextDividend = 1;
 					nextResult = 0;
-				end	
-					
+				end
 				else begin
-					nextIsDone = isDone;
-					nextResult = result;
+					nextIsDone = 1;
+					nextDividend = dividend;
+					nextResult = remainder;
 				end
 			end
 			
 			else begin
-				nextIsDone = isDone;
-				if (result == 0 & exponent > 0)
-					nextResult  = (1 << exponent) - number * (1 << (exponent - logNum - 1));
-				else if (result > number)
-					nextResult = result - number;
+				nextResult = result;
+				nextIsDone = 0;
+				if (exponent[bitIndex] == 1) begin
+					nextDividend = remainder * memMod;
+				end
 				else begin
-					nextResult = result;
-					nextIsDone = 1;
+					nextDividend = dividend;
 				end
 			end
 		end
+		
+		else begin
+			nextBitIndex = bitIndex;
+			nextDividend = dividend;
+			nextResult = result;
+			nextIsDone = isDone;
+		end
 	end
-	
 endmodule
